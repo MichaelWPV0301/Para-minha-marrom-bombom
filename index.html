@@ -79,8 +79,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px; /* espaço entre botões */
-      height: auto; /* ajusta a altura conforme conteúdo */
+      gap: 20px;
     }
 
     #sim {
@@ -92,10 +91,10 @@
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s ease;
-      position: relative;
       z-index: 1;
     }
 
+    /* Alteração aplicada aqui */
     #nao {
       background-color: #ffffff;
       color: #ff4d6d;
@@ -105,9 +104,8 @@
       border-radius: 10px;
       cursor: pointer;
       transition: transform 0.2s ease;
-      position: relative;
+      position: relative; /* Antes era absolute */
       z-index: 2;
-      transform: translate(0, 0);
     }
 
     #mensagem {
@@ -117,8 +115,7 @@
       color: white;
       margin-top: 30px;
       max-width: 95vw;
-      word-break: break-word;
-      margin-bottom: 60px; /* espaço extra para rolar melhor */
+      margin-bottom: 60px;
     }
 
     #mensagem img {
@@ -140,7 +137,7 @@
       justify-content: center;
       gap: 15px;
       margin-top: 25px;
-      margin-bottom: 60px; /* espaço extra para rolagem confortável */
+      margin-bottom: 60px;
     }
 
     .galeria img {
@@ -178,15 +175,15 @@
       cursor: pointer;
     }
 
-    .coracoes {
+    .coracoes, .frases {
       position: fixed;
       top: 0;
       left: 0;
+      pointer-events: none;
       width: 100%;
       height: 100%;
-      pointer-events: none;
-      overflow: hidden;
       z-index: -1;
+      overflow: hidden;
     }
 
     .coracao {
@@ -201,7 +198,24 @@
       100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
     }
 
-    /* Carta animada */
+    .frase {
+      position: absolute;
+      color: #fff;
+      font-size: 18px;
+      font-style: italic;
+      text-shadow: 1px 1px 3px #000;
+      opacity: 0;
+      animation: flutuarFrase 6s ease-in-out forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes flutuarFrase {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 1; }
+      80% { transform: translateY(-100px); opacity: 1; }
+      100% { transform: translateY(-150px); opacity: 0; }
+    }
+
     .carta {
       width: 300px;
       background: #fff;
@@ -213,9 +227,7 @@
       font-family: 'Georgia', serif;
       font-style: italic;
       display: none;
-      transform-origin: top;
       animation: abrirCarta 1s ease forwards;
-      user-select: none;
       text-align: left;
     }
 
@@ -224,30 +236,27 @@
       100% { transform: scaleY(1); opacity: 1; }
     }
 
+    .foto-canto {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid #ff4d6d;
+      box-shadow: 0 0 10px #ff4d6d;
+      object-fit: cover;
+      z-index: 10;
+      display: none;
+    }
+
     @media (max-width: 480px) {
-      body {
-        justify-content: flex-start;
-        padding-bottom: 100px; /* mais espaço para scroll no celular */
-      }
-      .heart {
-        margin-top: 40px;
-      }
       .question { font-size: 22px; }
       .destaque { font-size: 24px; }
       .final { font-size: 22px; }
-      #sim, #nao {
-        font-size: 16px;
-        padding: 12px 18px;
-      }
       #mensagem img { width: 150px; }
-      .galeria {
-        margin-bottom: 100px;
-      }
       .galeria img { width: 100px; height: 100px; }
-      .carta {
-        width: 90vw;
-        font-size: 14px;
-      }
+      .carta { width: 90vw; font-size: 14px; }
     }
   </style>
 </head>
@@ -257,6 +266,7 @@
   </audio>
 
   <div class="coracoes" id="coracoes"></div>
+  <div class="frases" id="frases"></div>
 
   <div class="heart">❤️</div>
   <div class="question" id="question"></div>
@@ -269,132 +279,128 @@
     <h2 id="fraseFinal"></h2>
     <img src="foto2.jpg" alt="Foto do casal" />
     <div class="contador" id="contador"></div>
-    <button id="surpresaBtn">Clique aqui para uma surpresa 🎁</button>
+    <button id="surpresaBtn">Olha que lindos amor, clica aqui 🎁</button>
     <div class="galeria" id="galeria" style="display: none;">
-      <img src="foto3.jpg" alt="Momento 1" />
-      <img src="foto6.jpg" alt="Momento 2" />
-      <img src="foto8.jpg" alt="Momento 3" />
-      <img src="foto9.jpg" alt="Momento 4" />
-      <img src="foto5.jpg" alt="Momento 5" />
+      <img src="foto3.jpg" />
+      <img src="foto6.jpg" />
+      <img src="foto8.jpg" />
+      <img src="foto9.jpg" />
+      <img src="foto5.jpg" />
     </div>
   </div>
 
-  <!-- Carta animada -->
   <div class="carta" id="carta">
     <h3>Meu amor,</h3>
     <p>Desde que você entrou na minha vida, tudo ficou mais bonito... Obrigado por ser meu tudo. 💕</p>
   </div>
 
+  <img src="foto4.jpg" id="fotoCanto" class="foto-canto" />
+
   <script>
-      const frases = [
-        "Eu sabia que você diria sim ❤️",
-        "Você é minha pessoa favorita no mundo inteiro.",
-        "Obrigado por ser meu lar.",
-        "MINHA marrom bombom da boca do lago azul"
-      ];
+    const frases = [
+      "Eu sabia que você diria sim ❤️",
+      "Você é minha pessoa favorita no mundo inteiro.",
+      "Obrigado por ser meu lar.",
+      "MINHA marrom bombom da boca do lago azul"
+    ];
 
-      const questionText = `Desde que te conheci,<br><span class="destaque">minha vida ficou mais colorida...</span><br><span class="final">Aceita continuar comigo pra sempre?</span>`;
+    const frasesSoltas = [
+      "Eu te amo ❤️", "Você é meu mundo 🌎", "vai ter afeto sim 💕",
+      "Para sempre nós 💑", "Tá vendo como eu não sei só pesar 😍", "Marrom bombom 🍫"
+    ];
 
-      const botaoNao = document.getElementById("nao");
-      const botaoSim = document.getElementById("sim");
-      const mensagem = document.getElementById("mensagem");
-      const fraseFinal = document.getElementById("fraseFinal");
-      const contador = document.getElementById("contador");
-      const galeria = document.getElementById("galeria");
-      const surpresaBtn = document.getElementById("surpresaBtn");
-      const carta = document.getElementById("carta");
+    const questionText = `Desde que te conheci,<br><span class="destaque">minha vida ficou mais colorida...</span><br><span class="final">Aceita continuar comigo pra sempre?</span>`;
 
-      function digitarTexto(elemento, texto, velocidade = 50) {
-        let i = 0;
-        function escrever() {
-          if (i < texto.length) {
-            if (texto.charAt(i) === "<") {
-              const finalTag = texto.indexOf(">", i);
-              elemento.innerHTML += texto.slice(i, finalTag + 1);
-              i = finalTag + 1;
-            } else {
-              elemento.innerHTML += texto.charAt(i);
-              i++;
-            }
-            setTimeout(escrever, velocidade);
+    const botaoNao = document.getElementById("nao");
+    const botaoSim = document.getElementById("sim");
+    const mensagem = document.getElementById("mensagem");
+    const fraseFinal = document.getElementById("fraseFinal");
+    const contador = document.getElementById("contador");
+    const galeria = document.getElementById("galeria");
+    const surpresaBtn = document.getElementById("surpresaBtn");
+    const carta = document.getElementById("carta");
+    const fotoCanto = document.getElementById("fotoCanto");
+
+    function digitarTexto(elemento, texto, velocidade = 50) {
+      let i = 0;
+      function escrever() {
+        if (i < texto.length) {
+          if (texto.charAt(i) === "<") {
+            const finalTag = texto.indexOf(">", i);
+            elemento.innerHTML += texto.slice(i, finalTag + 1);
+            i = finalTag + 1;
+          } else {
+            elemento.innerHTML += texto.charAt(i);
+            i++;
           }
+          setTimeout(escrever, velocidade);
         }
-        escrever();
       }
+      escrever();
+    }
 
-      digitarTexto(document.getElementById("question"), questionText);
+    digitarTexto(document.getElementById("question"), questionText);
 
-      function moverBotaoNao() {
-        const largura = window.innerWidth;
-        const altura = window.innerHeight;
+    function moverBotaoNao() {
+      const i = Math.random() * 200 - 100;
+      const j = Math.random() * 100 - 50;
+      botaoNao.style.transform = `translate(${i}px, ${j}px)`;
+    }
 
-        const btnRect = botaoNao.getBoundingClientRect();
-        const maxX = largura - btnRect.width - 40;
-        const maxY = altura - btnRect.height - 100;
+    botaoNao.addEventListener("mouseover", moverBotaoNao);
+    botaoNao.addEventListener("click", moverBotaoNao);
 
-        const i = Math.floor(Math.random() * maxX);
-        const j = Math.floor(Math.random() * maxY);
+    botaoSim.addEventListener("click", () => {
+      document.getElementById("musica").play().catch(() => {});
+      mensagem.style.display = "flex";
+      carta.style.display = "block";
+      fotoCanto.style.display = "block";
 
-        botaoNao.style.transform = `translate(${i - largura / 2}px, ${j - altura / 2}px)`;
-      }
-
-      botaoNao.addEventListener("mouseover", moverBotaoNao);
-      botaoNao.addEventListener("click", moverBotaoNao);
-
-      botaoSim.addEventListener("click", () => {
-        botaoSim.disabled = true; // evita múltiplos cliques
-
-        const musica = document.getElementById("musica");
-        musica.play().catch(e => console.log("Erro ao tentar tocar a música:", e));
-
-        mensagem.style.display = "flex";
-        mensagem.style.opacity = 0;
-        setTimeout(() => {
-          mensagem.style.transition = "opacity 1s ease";
-          mensagem.style.opacity = 1;
-        }, 100);
-
-        carta.style.display = "block";
-
-        let index = 0;
-        function mostrarFrase() {
-          if (index < frases.length) {
-            fraseFinal.innerText = frases[index];
-            index++;
-            setTimeout(mostrarFrase, 2000);
-          }
+      let index = 0;
+      function mostrarFrase() {
+        if (index < frases.length) {
+          fraseFinal.innerText = frases[index];
+          index++;
+          setTimeout(mostrarFrase, 2000);
         }
-        mostrarFrase();
-
-        const dataInicio = new Date("2025-05-20");
-        const hoje = new Date();
-        const dias = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
-        contador.innerText = `Estamos juntos há ${dias} dias ❤️`;
-      });
-
-      surpresaBtn.addEventListener("click", () => {
-        galeria.style.display = "flex";
-        galeria.style.opacity = 0;
-        galeria.style.transition = "opacity 1s ease";
-        setTimeout(() => {
-          galeria.style.opacity = 1;
-          galeria.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 50);
-      });
-
-      function criarCoracao() {
-        const coracoes = document.getElementById("coracoes");
-        const coracao = document.createElement("div");
-        coracao.classList.add("coracao");
-        coracao.style.left = Math.random() * 100 + "%";
-        coracao.style.fontSize = Math.random() * 30 + 20 + "px";
-        coracao.innerText = "❤";
-        coracoes.appendChild(coracao);
-        setTimeout(() => coracao.remove(), 6000);
       }
+      mostrarFrase();
 
-      setInterval(criarCoracao, 300);
+      const dataInicio = new Date("2025-05-20");
+      const hoje = new Date();
+      const dias = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
+      contador.innerText = `Estamos juntos há ${dias} dias ❤️`;
+    });
 
+    surpresaBtn.addEventListener("click", () => {
+      galeria.style.display = "flex";
+      galeria.scrollIntoView({ behavior: "smooth" });
+    });
+
+    function criarCoracao() {
+      const coracoes = document.getElementById("coracoes");
+      const c = document.createElement("div");
+      c.classList.add("coracao");
+      c.style.left = Math.random() * 100 + "%";
+      c.style.fontSize = Math.random() * 30 + 20 + "px";
+      c.innerText = "❤";
+      coracoes.appendChild(c);
+      setTimeout(() => c.remove(), 6000);
+    }
+
+    function criarFraseFlutuante() {
+      const frasesDiv = document.getElementById("frases");
+      const f = document.createElement("div");
+      f.classList.add("frase");
+      f.innerText = frasesSoltas[Math.floor(Math.random() * frasesSoltas.length)];
+      f.style.left = Math.random() * 90 + "%";
+      f.style.top = Math.random() * 90 + "%";
+      frasesDiv.appendChild(f);
+      setTimeout(() => f.remove(), 6000);
+    }
+
+    setInterval(criarCoracao, 300);
+    setInterval(criarFraseFlutuante, 2500);
   </script>
 </body>
 </html>
