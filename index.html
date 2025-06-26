@@ -286,100 +286,115 @@
   </div>
 
   <script>
-    const frases = [
-      "Eu sabia que você diria sim ❤️",
-      "Você é minha pessoa favorita no mundo inteiro.",
-      "Obrigado por ser meu lar.",
-      "MINHA marrom bombom da boca do lago azul"
-    ];
+      const frases = [
+        "Eu sabia que você diria sim ❤️",
+        "Você é minha pessoa favorita no mundo inteiro.",
+        "Obrigado por ser meu lar.",
+        "MINHA marrom bombom da boca do lago azul"
+      ];
 
-    const questionText = `Desde que te conheci,<br><span class="destaque">minha vida ficou mais colorida...</span><br><span class="final">Aceita continuar comigo pra sempre?</span>`;
+      const questionText = `Desde que te conheci,<br><span class="destaque">minha vida ficou mais colorida...</span><br><span class="final">Aceita continuar comigo pra sempre?</span>`;
 
-    const botaoNao = document.getElementById("nao");
-    const botaoSim = document.getElementById("sim");
-    const mensagem = document.getElementById("mensagem");
-    const fraseFinal = document.getElementById("fraseFinal");
-    const contador = document.getElementById("contador");
-    const galeria = document.getElementById("galeria");
-    const surpresaBtn = document.getElementById("surpresaBtn");
-    const carta = document.getElementById("carta");
+      const botaoNao = document.getElementById("nao");
+      const botaoSim = document.getElementById("sim");
+      const mensagem = document.getElementById("mensagem");
+      const fraseFinal = document.getElementById("fraseFinal");
+      const contador = document.getElementById("contador");
+      const galeria = document.getElementById("galeria");
+      const surpresaBtn = document.getElementById("surpresaBtn");
+      const carta = document.getElementById("carta");
 
-    function digitarTexto(elemento, texto, velocidade = 50) {
-      let i = 0;
-      function escrever() {
-        if (i < texto.length) {
-          if (texto.charAt(i) === "<") {
-            const finalTag = texto.indexOf(">", i);
-            elemento.innerHTML += texto.slice(i, finalTag + 1);
-            i = finalTag + 1;
-          } else {
-            elemento.innerHTML += texto.charAt(i);
-            i++;
+      function digitarTexto(elemento, texto, velocidade = 50) {
+        let i = 0;
+        function escrever() {
+          if (i < texto.length) {
+            if (texto.charAt(i) === "<") {
+              const finalTag = texto.indexOf(">", i);
+              elemento.innerHTML += texto.slice(i, finalTag + 1);
+              i = finalTag + 1;
+            } else {
+              elemento.innerHTML += texto.charAt(i);
+              i++;
+            }
+            setTimeout(escrever, velocidade);
           }
-          setTimeout(escrever, velocidade);
         }
+        escrever();
       }
-      escrever();
-    }
 
-    digitarTexto(document.getElementById("question"), questionText);
+      digitarTexto(document.getElementById("question"), questionText);
 
-    function moverBotaoNao() {
-      const largura = window.innerWidth;
-      const altura = window.innerHeight;
+      function moverBotaoNao() {
+        const largura = window.innerWidth;
+        const altura = window.innerHeight;
 
-      const maxX = largura < 480 ? 160 : 100;
-      const maxY = altura < 480 ? 120 : 60;
+        const btnRect = botaoNao.getBoundingClientRect();
+        const maxX = largura - btnRect.width - 40;
+        const maxY = altura - btnRect.height - 100;
 
-      const i = Math.floor(Math.random() * maxX * 2) - maxX;
-      const j = Math.floor(Math.random() * maxY * 2) - maxY;
+        const i = Math.floor(Math.random() * maxX);
+        const j = Math.floor(Math.random() * maxY);
 
-      botaoNao.style.transform = `translate(${i}px, ${j}px)`;
-    }
+        botaoNao.style.transform = `translate(${i - largura / 2}px, ${j - altura / 2}px)`;
+      }
 
-    botaoNao.addEventListener("mouseover", moverBotaoNao);
-    botaoNao.addEventListener("click", moverBotaoNao);
+      botaoNao.addEventListener("mouseover", moverBotaoNao);
+      botaoNao.addEventListener("click", moverBotaoNao);
 
-    botaoSim.addEventListener("click", () => {
-      const musica = document.getElementById("musica");
-      musica.play().catch(e => console.log("Erro ao tentar tocar a música:", e));
+      botaoSim.addEventListener("click", () => {
+        botaoSim.disabled = true; // evita múltiplos cliques
 
-      mensagem.style.display = "flex";
-      carta.style.display = "block";  // mostra a carta animada
+        const musica = document.getElementById("musica");
+        musica.play().catch(e => console.log("Erro ao tentar tocar a música:", e));
 
-      let index = 0;
-      function mostrarFrase() {
-        if (index < frases.length) {
-          fraseFinal.innerText = frases[index];
-          index++;
-          setTimeout(mostrarFrase, 2000);
+        mensagem.style.display = "flex";
+        mensagem.style.opacity = 0;
+        setTimeout(() => {
+          mensagem.style.transition = "opacity 1s ease";
+          mensagem.style.opacity = 1;
+        }, 100);
+
+        carta.style.display = "block";
+
+        let index = 0;
+        function mostrarFrase() {
+          if (index < frases.length) {
+            fraseFinal.innerText = frases[index];
+            index++;
+            setTimeout(mostrarFrase, 2000);
+          }
         }
+        mostrarFrase();
+
+        const dataInicio = new Date("2025-05-20");
+        const hoje = new Date();
+        const dias = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
+        contador.innerText = `Estamos juntos há ${dias} dias ❤️`;
+      });
+
+      surpresaBtn.addEventListener("click", () => {
+        galeria.style.display = "flex";
+        galeria.style.opacity = 0;
+        galeria.style.transition = "opacity 1s ease";
+        setTimeout(() => {
+          galeria.style.opacity = 1;
+          galeria.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 50);
+      });
+
+      function criarCoracao() {
+        const coracoes = document.getElementById("coracoes");
+        const coracao = document.createElement("div");
+        coracao.classList.add("coracao");
+        coracao.style.left = Math.random() * 100 + "%";
+        coracao.style.fontSize = Math.random() * 30 + 20 + "px";
+        coracao.innerText = "❤";
+        coracoes.appendChild(coracao);
+        setTimeout(() => coracao.remove(), 6000);
       }
-      mostrarFrase();
 
-      const dataInicio = new Date("2025-05-20");
-      const hoje = new Date();
-      const dias = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
-      contador.innerText = `Estamos juntos há ${dias} dias ❤️`;
-    });
+      setInterval(criarCoracao, 300);
 
-    surpresaBtn.addEventListener("click", () => {
-      galeria.style.display = "flex";
-      galeria.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-
-    function criarCoracao() {
-      const coracoes = document.getElementById("coracoes");
-      const coracao = document.createElement("div");
-      coracao.classList.add("coracao");
-      coracao.style.left = Math.random() * 100 + "%";
-      coracao.style.fontSize = Math.random() * 30 + 20 + "px";
-      coracao.innerText = "❤";
-      coracoes.appendChild(coracao);
-      setTimeout(() => coracao.remove(), 6000);
-    }
-
-    setInterval(criarCoracao, 300);
   </script>
 </body>
 </html>
