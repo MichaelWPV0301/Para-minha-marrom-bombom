@@ -33,8 +33,39 @@
       font-size: 28px;
       margin: 20px;
       color: #fff;
+      text-align: center;
       text-shadow: 1px 1px 2px #00000066;
       min-height: 40px;
+    }
+
+    .destaque {
+      font-weight: bold;
+      color: #ffe066;
+      text-shadow: 2px 2px 4px #ff4d6d;
+      font-size: 30px;
+      display: inline-block;
+      margin-top: 10px;
+      animation: brilho 2s infinite alternate;
+    }
+
+    .final {
+      display: inline-block;
+      margin-top: 15px;
+      font-size: 26px;
+      color: #ffffff;
+      font-style: italic;
+      text-shadow: 1px 1px 2px #00000099;
+      animation: subir 1s ease-in-out;
+    }
+
+    @keyframes brilho {
+      0% { opacity: 0.8; text-shadow: 2px 2px 4px #ff4d6d; }
+      100% { opacity: 1; text-shadow: 2px 2px 8px #ff1e56; }
+    }
+
+    @keyframes subir {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .buttons {
@@ -166,8 +197,8 @@
   </style>
 </head>
 <body>
-  <audio autoplay loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+  <audio id="musica" loop>
+    <source src="nossa.mp3" type="audio/mpeg">
   </audio>
 
   <div class="coracoes" id="coracoes"></div>
@@ -201,7 +232,7 @@
       "MINHA marrom bombom da boca do lago azul"
     ];
 
-    const questionText = "Desde que te conheci, minha vida ficou mais colorida... aceita continuar comigo pra sempre?";
+    const questionText = `Desde que te conheci,<br><span class="destaque">minha vida ficou mais colorida...</span><br><span class="final">Aceita continuar comigo pra sempre?</span>`;
 
     const botaoNao = document.getElementById("nao");
     const botaoSim = document.getElementById("sim");
@@ -215,13 +246,20 @@
       let i = 0;
       function escrever() {
         if (i < texto.length) {
-          elemento.innerHTML += texto.charAt(i);
-          i++;
+          if (texto.charAt(i) === "<") {
+            const finalTag = texto.indexOf(">", i);
+            elemento.innerHTML += texto.slice(i, finalTag + 1);
+            i = finalTag + 1;
+          } else {
+            elemento.innerHTML += texto.charAt(i);
+            i++;
+          }
           setTimeout(escrever, velocidade);
         }
       }
       escrever();
     }
+
     digitarTexto(document.getElementById("question"), questionText);
 
     function moverBotaoNao() {
@@ -236,6 +274,9 @@
     botaoNao.addEventListener("click", moverBotaoNao);
 
     botaoSim.addEventListener("click", () => {
+      const musica = document.getElementById("musica");
+      musica.play().catch(e => console.log("Erro ao tentar tocar a música:", e));
+
       mensagem.style.display = "flex";
       let index = 0;
       function mostrarFrase() {
@@ -247,7 +288,7 @@
       }
       mostrarFrase();
 
-      const dataInicio = new Date("2023-06-12");
+      const dataInicio = new Date("2025-05-20");
       const hoje = new Date();
       const dias = Math.floor((hoje - dataInicio) / (1000 * 60 * 60 * 24));
       contador.innerText = `Estamos juntos há ${dias} dias ❤️`;
