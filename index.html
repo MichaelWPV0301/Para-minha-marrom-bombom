@@ -258,6 +258,43 @@
       .galeria img { width: 100px; height: 100px; }
       .carta { width: 90vw; font-size: 14px; }
     }
+    .mascote {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      z-index: 10;
+      cursor: pointer;
+      animation: flutuarMascote 3s ease-in-out infinite;
+    }
+
+    @keyframes flutuarMascote {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .balao-mascote {
+      position: fixed;
+      bottom: 110px;
+      left: 30px;
+      background-color: #fff;
+      color: #ff4d6d;
+      border-radius: 10px;
+      padding: 10px;
+      max-width: 160px;
+      font-size: 14px;
+      font-family: 'Arial', sans-serif;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: none;
+      animation: aparecerBalao 0.4s ease forwards;
+    }
+
+    @keyframes aparecerBalao {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -295,7 +332,8 @@
   </div>
 
   <img src="foto4.jpg" id="fotoCanto" class="foto-canto" />
-
+  <img src="ursinho.png" id="mascote" class="mascote" alt="Mascote fofo" />
+  <div id="balaoMascote" class="balao-mascote"></div>
   <script>
     const frases = [
       "Eu sabia que você diria sim ❤️",
@@ -401,6 +439,29 @@
 
     setInterval(criarCoracao, 300);
     setInterval(criarFraseFlutuante, 2500);
+    
+    const mascote = document.getElementById("mascote");
+    const balaoMascote = document.getElementById("balaoMascote");
+
+    const frasesMascote = [
+      "Eu também te amo! 💖",
+      "Para de clicar que eu fico tímido 😳",
+      "Você é tudo pra ele ❤️",
+      "Afeto mode: ativado 💕",
+      "Own... você é muito fofa!"
+    ];
+
+    let cliqueMascote = 0;
+
+    mascote.addEventListener("click", () => {
+      const frase = frasesMascote[cliqueMascote % frasesMascote.length];
+      balaoMascote.innerText = frase;
+      balaoMascote.style.display = "block";
+      cliqueMascote++;
+      setTimeout(() => {
+        balaoMascote.style.display = "none";
+      }, 3000);
+    });
   </script>
 </body>
 </html>
